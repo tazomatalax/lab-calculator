@@ -7,6 +7,8 @@ import os
 from PyQt5.QtWidgets import QApplication, QMainWindow, QTabWidget, QVBoxLayout, QWidget, QStatusBar, QAction, QMessageBox
 from calc_modules import dilution_calculator
 from calc_modules import c1v1_calculator
+from calc_modules.continuous_bioreactor_calculator import ContinuousBioreactorCalculator
+from calc_modules.fed_batch_bioreactor_calculator import FedBatchBioreactorCalculator
 
 class LabCalculatorApp(QMainWindow):
     """Main application class for the Lab Calculator"""
@@ -34,6 +36,14 @@ class LabCalculatorApp(QMainWindow):
         # Create the C1V1 calculator tab
         self.c1v1_tab = c1v1_calculator.C1V1Calculator()
         self.tab_widget.addTab(self.c1v1_tab, "C1V1 Calculator")
+        
+        # Create the continuous bioreactor calculator tab
+        self.continuous_bioreactor_tab = ContinuousBioreactorCalculator()
+        self.tab_widget.addTab(self.continuous_bioreactor_tab, "Continuous Bioreactor")
+        
+        # Create the fed-batch bioreactor calculator tab
+        self.fed_batch_bioreactor_tab = FedBatchBioreactorCalculator()
+        self.tab_widget.addTab(self.fed_batch_bioreactor_tab, "Fed-Batch Bioreactor")
         
         # Status bar
         self.status_bar = QStatusBar()
