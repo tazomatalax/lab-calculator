@@ -199,10 +199,11 @@ class DilutionCalculator(QWidget):
     
     @pyqtSlot()
     def calculate_dilution(self):
-        """Calculate the dilution factor needed to achieve the target OD"""
+        """Calculate the dilution factor needed to achieve the target OD and the volume to add."""
         try:
             current_od = float(self.current_od_input.text())
             target_od = float(self.target_od_input.text())
+            final_volume = float(self.final_volume_input.text())
 
             if current_od <= 0:
                 self.update_results("Error: Current OD must be greater than zero.")
@@ -215,11 +216,20 @@ class DilutionCalculator(QWidget):
             # Calculate dilution factor
             dilution_factor = current_od / target_od
 
+            # Calculate the volume of the sample to add
+            sample_volume = final_volume / dilution_factor
+
+            # Calculate the volume of diluent to add
+            diluent_volume = final_volume - sample_volume
+
             self.update_results(
                 f"Dilution Factor Calculation Results:\n\n"
                 f"Current OD: {current_od:.4f}\n"
-                f"Target OD: {target_od:.4f}\n\n"
-                f"Dilution factor: 1:{dilution_factor:.2f}"
+                f"Target OD: {target_od:.4f}\n"
+                f"Final Volume: {final_volume:.2f} mL\n\n"
+                f"Dilution factor: 1:{dilution_factor:.2f}\n"
+                f"Volume of Sample to Add: {sample_volume:.2f} mL\n"
+                f"Volume of Diluent to Add: {diluent_volume:.2f} mL"
             )
 
         except Exception as e:
