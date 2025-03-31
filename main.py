@@ -15,8 +15,8 @@ class LabCalculatorApp(QMainWindow):
         """Initialize the application"""
         super().__init__()
         self.setWindowTitle("Lab Calculator")
-        self.setGeometry(100, 100, 600, 400)
-        self.setMinimumSize(500, 350)
+        self.setGeometry(100, 100, 900, 700)
+        self.setMinimumSize(550, 450)
         
         # Create central widget with layout
         self.central_widget = QWidget()

@@ -89,6 +89,30 @@ class DilutionCalculator(QWidget):
         main_layout.addWidget(input_group)
         main_layout.addWidget(results_group)
 
+        # ------------ Dilution Factor Section ------------
+        dilution_factor_group = QGroupBox("Dilution Factor Calculation")
+        dilution_factor_layout = QFormLayout()
+
+        # Volume of Sample
+        self.sample_volume_input = QLineEdit()
+        self.sample_volume_input.setValidator(QDoubleValidator(0, 10000, 2))
+        self.sample_volume_input.setText("0.0")
+        dilution_factor_layout.addRow("Volume of Sample (mL):", self.sample_volume_input)
+
+        # Volume of Diluent
+        self.diluent_volume_input = QLineEdit()
+        self.diluent_volume_input.setValidator(QDoubleValidator(0, 10000, 2))
+        self.diluent_volume_input.setText("0.0")
+        dilution_factor_layout.addRow("Volume of Diluent (mL):", self.diluent_volume_input)
+
+        # Calculate button
+        self.calculate_dilution_factor_button = QPushButton("Calculate Dilution Factor")
+        self.calculate_dilution_factor_button.clicked.connect(self.calculate_dilution_factor)
+        dilution_factor_layout.addRow(self.calculate_dilution_factor_button)
+
+        dilution_factor_group.setLayout(dilution_factor_layout)
+        input_layout.addWidget(dilution_factor_group)
+
         # ------------ OD Calculation Section ------------
         od_group = QGroupBox("OD Calculation")
         od_layout = QFormLayout()
@@ -175,37 +199,53 @@ class DilutionCalculator(QWidget):
     
     @pyqtSlot()
     def calculate_dilution(self):
-        """Calculate the volumes needed for a dilution"""
+        """Calculate the dilution factor needed to achieve the target OD"""
         try:
             current_od = float(self.current_od_input.text())
             target_od = float(self.target_od_input.text())
-            final_volume = float(self.final_volume_input.text())
-            
+
             if current_od <= 0:
                 self.update_results("Error: Current OD must be greater than zero.")
                 return
-                
+
             if target_od >= current_od:
                 self.update_results("Error: Target OD must be less than current OD for dilution.")
                 return
-            
-            # Calculate culture volume and diluent volume
-            culture_volume = (target_od / current_od) * final_volume
-            diluent_volume = final_volume - culture_volume
-            
+
             # Calculate dilution factor
             dilution_factor = current_od / target_od
-            
+
             self.update_results(
-                f"Dilution Results:\n\n"
+                f"Dilution Factor Calculation Results:\n\n"
                 f"Current OD: {current_od:.4f}\n"
-                f"Target OD: {target_od:.4f}\n"
-                f"Final volume: {final_volume:.2f} mL\n\n"
-                f"Add {culture_volume:.2f} mL of culture\n"
-                f"Add {diluent_volume:.2f} mL of diluent\n\n"
+                f"Target OD: {target_od:.4f}\n\n"
                 f"Dilution factor: 1:{dilution_factor:.2f}"
             )
-            
+
+        except Exception as e:
+            self.update_results(f"Error: {str(e)}\n\nPlease check your input values.")
+    
+    @pyqtSlot()
+    def calculate_dilution_factor(self):
+        """Calculate the dilution factor based on sample and diluent volumes"""
+        try:
+            sample_volume = float(self.sample_volume_input.text())
+            diluent_volume = float(self.diluent_volume_input.text())
+
+            if sample_volume <= 0:
+                self.update_results("Error: Volume of Sample must be greater than zero.")
+                return
+
+            # Calculate dilution factor
+            dilution_factor = (sample_volume + diluent_volume) / sample_volume
+
+            self.update_results(
+                f"Dilution Factor Calculation Results:\n\n"
+                f"Volume of Sample: {sample_volume:.2f} mL\n"
+                f"Volume of Diluent: {diluent_volume:.2f} mL\n\n"
+                f"Dilution Factor: {dilution_factor:.2f}"
+            )
+
         except Exception as e:
             self.update_results(f"Error: {str(e)}\n\nPlease check your input values.")
     
