@@ -18,6 +18,59 @@ class DilutionCalculator(QWidget):
         
         # Create the input form
         self.create_widgets()
+        
+        # Apply styles to the widget
+        self.setStyleSheet(
+            """
+            QWidget {
+                font-family: Arial, sans-serif;
+                font-size: 14px;
+            }
+
+            QGroupBox {
+                border: 2px solid #4CAF50;
+                border-radius: 5px;
+                margin-top: 10px;
+                padding: 10px;
+            }
+
+            QGroupBox::title {
+                subcontrol-origin: margin;
+                subcontrol-position: top center;
+                padding: 0 3px;
+                color: #4CAF50;
+                font-weight: bold;
+            }
+
+            QLabel {
+                color: #333;
+            }
+
+            QLineEdit {
+                border: 1px solid #ccc;
+                border-radius: 5px;
+                padding: 5px;
+                background: #f9f9f9;
+            }
+
+            QPushButton {
+                background-color: #4CAF50;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                padding: 8px 15px;
+                font-size: 14px;
+            }
+
+            QPushButton:hover {
+                background-color: #45a049;
+            }
+
+            QPushButton:pressed {
+                background-color: #3e8e41;
+            }
+            """
+        )
     
     def create_widgets(self):
         """Create all the form widgets"""

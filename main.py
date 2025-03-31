@@ -6,6 +6,7 @@ import sys
 import os
 from PyQt5.QtWidgets import QApplication, QMainWindow, QTabWidget, QVBoxLayout, QWidget, QStatusBar, QAction, QMessageBox
 from calc_modules import dilution_calculator
+from calc_modules import c1v1_calculator
 
 class LabCalculatorApp(QMainWindow):
     """Main application class for the Lab Calculator"""
@@ -29,6 +30,10 @@ class LabCalculatorApp(QMainWindow):
         # Create the dilution calculator tab
         self.dilution_tab = dilution_calculator.DilutionCalculator()
         self.tab_widget.addTab(self.dilution_tab, "Dilution Calculator")
+        
+        # Create the C1V1 calculator tab
+        self.c1v1_tab = c1v1_calculator.C1V1Calculator()
+        self.tab_widget.addTab(self.c1v1_tab, "C1V1 Calculator")
         
         # Status bar
         self.status_bar = QStatusBar()
