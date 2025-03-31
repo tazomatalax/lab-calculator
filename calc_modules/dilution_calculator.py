@@ -246,6 +246,9 @@ class DilutionCalculator(QWidget):
                 f"Dilution Factor: {dilution_factor:.2f}"
             )
 
+            # Auto-fill the dilution factor input for the next calculation
+            self.dilution_factor_input.setText(f"{dilution_factor:.2f}")
+
         except Exception as e:
             self.update_results(f"Error: {str(e)}\n\nPlease check your input values.")
     
