@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QGroupBox,
 from PyQt5.QtCore import Qt, pyqtSlot
 from PyQt5.QtGui import QDoubleValidator
 import math
+from datetime import datetime
 
 class DilutionCalculator(QWidget):
     """
@@ -186,7 +187,7 @@ class DilutionCalculator(QWidget):
             
             od = absorbance * dilution_factor
             
-            self.update_results(f"OD Calculation Results:\n\n"
+            self.append_results(f"OD Calculation Results:\n\n"
                                f"Absorbance: {absorbance:.4f}\n"
                                f"Dilution Factor: {dilution_factor:.2f}\n"
                                f"Calculated OD: {od:.4f}")
@@ -195,7 +196,7 @@ class DilutionCalculator(QWidget):
             self.current_od_input.setText(f"{od:.4f}")
             
         except Exception as e:
-            self.update_results(f"Error: {str(e)}\n\nPlease check your input values.")
+            self.append_results(f"Error: {str(e)}\n\nPlease check your input values.")
     
     @pyqtSlot()
     def calculate_dilution(self):
@@ -206,11 +207,11 @@ class DilutionCalculator(QWidget):
             final_volume = float(self.final_volume_input.text())
 
             if current_od <= 0:
-                self.update_results("Error: Current OD must be greater than zero.")
+                self.append_results("Error: Current OD must be greater than zero.")
                 return
 
             if target_od >= current_od:
-                self.update_results("Error: Target OD must be less than current OD for dilution.")
+                self.append_results("Error: Target OD must be less than current OD for dilution.")
                 return
 
             # Calculate dilution factor
@@ -222,7 +223,7 @@ class DilutionCalculator(QWidget):
             # Calculate the volume of diluent to add
             diluent_volume = final_volume - sample_volume
 
-            self.update_results(
+            self.append_results(
                 f"Dilution Factor Calculation Results:\n\n"
                 f"Current OD: {current_od:.4f}\n"
                 f"Target OD: {target_od:.4f}\n"
@@ -233,7 +234,7 @@ class DilutionCalculator(QWidget):
             )
 
         except Exception as e:
-            self.update_results(f"Error: {str(e)}\n\nPlease check your input values.")
+            self.append_results(f"Error: {str(e)}\n\nPlease check your input values.")
     
     @pyqtSlot()
     def calculate_dilution_factor(self):
@@ -243,13 +244,13 @@ class DilutionCalculator(QWidget):
             diluent_volume = float(self.diluent_volume_input.text())
 
             if sample_volume <= 0:
-                self.update_results("Error: Volume of Sample must be greater than zero.")
+                self.append_results("Error: Volume of Sample must be greater than zero.")
                 return
 
             # Calculate dilution factor
             dilution_factor = (sample_volume + diluent_volume) / sample_volume
 
-            self.update_results(
+            self.append_results(
                 f"Dilution Factor Calculation Results:\n\n"
                 f"Volume of Sample: {sample_volume:.2f} mL\n"
                 f"Volume of Diluent: {diluent_volume:.2f} mL\n\n"
@@ -260,11 +261,30 @@ class DilutionCalculator(QWidget):
             self.dilution_factor_input.setText(f"{dilution_factor:.2f}")
 
         except Exception as e:
-            self.update_results(f"Error: {str(e)}\n\nPlease check your input values.")
+            self.append_results(f"Error: {str(e)}\n\nPlease check your input values.")
     
     def update_results(self, text):
-        """Update the results text widget"""
+        """Update the results text widget (kept for backwards compatibility)"""
         self.results_text.setPlainText(text)
+    
+    def append_results(self, text):
+        """Append new results to the results text widget with timestamp"""
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        separator = "-" * 50
+        
+        # Append the new results with a timestamp and separator
+        current_text = self.results_text.toPlainText()
+        
+        # If there's already text, add a separator before the new content
+        if current_text:
+            new_text = f"{current_text}\n\n{separator}\n{timestamp}\n{text}"
+        else:
+            new_text = f"{timestamp}\n{text}"
+            
+        self.results_text.setPlainText(new_text)
+        
+        # Scroll to the bottom to show the latest results
+        self.results_text.moveCursor(self.results_text.textCursor().End)
     
     @pyqtSlot()
     def clear_all(self):
@@ -274,4 +294,6 @@ class DilutionCalculator(QWidget):
         self.current_od_input.setText("0.0")
         self.target_od_input.setText("0.0")
         self.final_volume_input.setText("10.0")
+        self.sample_volume_input.setText("0.0")
+        self.diluent_volume_input.setText("0.0")
         self.results_text.clear()
