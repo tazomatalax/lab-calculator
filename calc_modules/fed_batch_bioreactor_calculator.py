@@ -1,6 +1,7 @@
-from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QGroupBox, QLineEdit, QPushButton, QTextEdit, QFormLayout)
+from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QGroupBox, QLineEdit, QPushButton, QTextEdit, QFormLayout)
 from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtGui import QDoubleValidator
+import datetime
 
 class FedBatchBioreactorCalculator(QWidget):
     """Calculator for fed-batch bioreactor calculations"""
@@ -61,7 +62,20 @@ class FedBatchBioreactorCalculator(QWidget):
         )
 
     def create_widgets(self):
-        layout = QVBoxLayout(self)
+        # Create main horizontal layout with inputs on left, results on right
+        main_layout = QHBoxLayout(self)
+        
+        # Create left panel for inputs
+        input_group = QGroupBox("Inputs")
+        input_layout = QVBoxLayout(input_group)
+        
+        # Create right panel for results
+        results_group = QGroupBox("Results")
+        results_layout = QVBoxLayout(results_group)
+        
+        # Add panels to main layout
+        main_layout.addWidget(input_group)
+        main_layout.addWidget(results_group)
 
         # Substrate Feeding Rate Section
         feeding_rate_group = QGroupBox("Substrate Feeding Rate")
@@ -69,22 +83,22 @@ class FedBatchBioreactorCalculator(QWidget):
 
         self.sf_input = QLineEdit()
         self.sf_input.setValidator(QDoubleValidator(0, 10000, 2))
-        feeding_rate_layout.addRow("Substrate Concentration in Feed (Sf):", self.sf_input)
+        feeding_rate_layout.addRow("Substrate Concentration in Feed (Sf) [g/L]:", self.sf_input)
 
         self.s_input = QLineEdit()
         self.s_input.setValidator(QDoubleValidator(0, 10000, 2))
-        feeding_rate_layout.addRow("Substrate Concentration in Reactor (S):", self.s_input)
+        feeding_rate_layout.addRow("Substrate Concentration in Reactor (S) [g/L]:", self.s_input)
 
         self.time_input = QLineEdit()
         self.time_input.setValidator(QDoubleValidator(0, 10000, 2))
-        feeding_rate_layout.addRow("Time (t):", self.time_input)
+        feeding_rate_layout.addRow("Time (t) [h]:", self.time_input)
 
         self.calculate_feeding_rate_button = QPushButton("Calculate Feeding Rate")
         self.calculate_feeding_rate_button.clicked.connect(self.calculate_feeding_rate)
         feeding_rate_layout.addRow(self.calculate_feeding_rate_button)
 
         feeding_rate_group.setLayout(feeding_rate_layout)
-        layout.addWidget(feeding_rate_group)
+        input_layout.addWidget(feeding_rate_group)
 
         # Biomass Concentration Section
         biomass_group = QGroupBox("Biomass Concentration")
@@ -92,22 +106,22 @@ class FedBatchBioreactorCalculator(QWidget):
 
         self.x0_input = QLineEdit()
         self.x0_input.setValidator(QDoubleValidator(0, 10000, 2))
-        biomass_layout.addRow("Initial Biomass Concentration (X0):", self.x0_input)
+        biomass_layout.addRow("Initial Biomass Concentration (X0) [g/L]:", self.x0_input)
 
         self.mu_input = QLineEdit()
         self.mu_input.setValidator(QDoubleValidator(0, 100, 4))
-        biomass_layout.addRow("Specific Growth Rate (μ):", self.mu_input)
+        biomass_layout.addRow("Specific Growth Rate (μ) [h⁻¹]:", self.mu_input)
 
         self.xt_time_input = QLineEdit()
         self.xt_time_input.setValidator(QDoubleValidator(0, 10000, 2))
-        biomass_layout.addRow("Time (t):", self.xt_time_input)
+        biomass_layout.addRow("Time (t) [h]:", self.xt_time_input)
 
         self.calculate_biomass_button = QPushButton("Calculate Biomass Concentration")
         self.calculate_biomass_button.clicked.connect(self.calculate_biomass_concentration)
         biomass_layout.addRow(self.calculate_biomass_button)
 
         biomass_group.setLayout(biomass_layout)
-        layout.addWidget(biomass_group)
+        input_layout.addWidget(biomass_group)
 
         # Product Formation Rate Section
         product_rate_group = QGroupBox("Product Formation Rate")
@@ -115,18 +129,18 @@ class FedBatchBioreactorCalculator(QWidget):
 
         self.dp_input = QLineEdit()
         self.dp_input.setValidator(QDoubleValidator(0, 10000, 2))
-        product_rate_layout.addRow("Change in Product Concentration (dP):", self.dp_input)
+        product_rate_layout.addRow("Change in Product Concentration (dP) [g/L]:", self.dp_input)
 
         self.dt_input = QLineEdit()
         self.dt_input.setValidator(QDoubleValidator(0, 10000, 2))
-        product_rate_layout.addRow("Change in Time (dt):", self.dt_input)
+        product_rate_layout.addRow("Change in Time (dt) [h]:", self.dt_input)
 
         self.calculate_product_rate_button = QPushButton("Calculate Product Formation Rate")
         self.calculate_product_rate_button.clicked.connect(self.calculate_product_formation_rate)
         product_rate_layout.addRow(self.calculate_product_rate_button)
 
         product_rate_group.setLayout(product_rate_layout)
-        layout.addWidget(product_rate_group)
+        input_layout.addWidget(product_rate_group)
 
         # Yield Coefficient Section
         yield_group = QGroupBox("Yield Coefficient")
@@ -134,23 +148,56 @@ class FedBatchBioreactorCalculator(QWidget):
 
         self.delta_x_input = QLineEdit()
         self.delta_x_input.setValidator(QDoubleValidator(0, 10000, 2))
-        yield_layout.addRow("Change in Biomass Concentration (ΔX):", self.delta_x_input)
+        yield_layout.addRow("Change in Biomass Concentration (ΔX) [g/L]:", self.delta_x_input)
 
         self.delta_s_input = QLineEdit()
         self.delta_s_input.setValidator(QDoubleValidator(0, 10000, 2))
-        yield_layout.addRow("Change in Substrate Concentration (ΔS):", self.delta_s_input)
+        yield_layout.addRow("Change in Substrate Concentration (ΔS) [g/L]:", self.delta_s_input)
 
         self.calculate_yield_button = QPushButton("Calculate Yield Coefficient")
         self.calculate_yield_button.clicked.connect(self.calculate_yield_coefficient)
         yield_layout.addRow(self.calculate_yield_button)
 
         yield_group.setLayout(yield_layout)
-        layout.addWidget(yield_group)
+        input_layout.addWidget(yield_group)
+        
+        # Buttons Panel for Results
+        buttons_layout = QHBoxLayout()
+        
+        # Clear button
+        self.clear_button = QPushButton("Clear All")
+        self.clear_button.clicked.connect(self.clear_all)
+        buttons_layout.addWidget(self.clear_button)
+        
+        # Clear Results button
+        self.clear_results_button = QPushButton("Clear Results")
+        self.clear_results_button.clicked.connect(self.clear_results)
+        buttons_layout.addWidget(self.clear_results_button)
+        
+        input_layout.addLayout(buttons_layout)
 
         # Results Section
         self.results_text = QTextEdit()
         self.results_text.setReadOnly(True)
-        layout.addWidget(self.results_text)
+        results_layout.addWidget(self.results_text)
+        
+    def append_results(self, text):
+        """Append text to the results with a timestamp and separator"""
+        current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        separator = "-" * 50
+        
+        # Get current text and append new results
+        current_text = self.results_text.toPlainText()
+        if current_text:
+            new_text = f"{current_text}\n\n{separator}\n{current_time}\n{text}"
+        else:
+            new_text = f"{current_time}\n{text}"
+        
+        # Set the updated text and scroll to the bottom
+        self.results_text.setPlainText(new_text)
+        self.results_text.verticalScrollBar().setValue(
+            self.results_text.verticalScrollBar().maximum()
+        )
 
     @pyqtSlot()
     def calculate_feeding_rate(self):
@@ -160,13 +207,19 @@ class FedBatchBioreactorCalculator(QWidget):
             t = float(self.time_input.text())
 
             if t <= 0:
-                self.results_text.setPlainText("Error: Time must be greater than zero.")
+                self.append_results("Error: Time must be greater than zero.")
                 return
 
             feeding_rate = (sf - s) / t
-            self.results_text.setPlainText(f"Substrate Feeding Rate (Fs): {feeding_rate:.4f}")
+            self.append_results(f"Substrate Feeding Rate Results:\n\n"
+                              f"Substrate Concentration in Feed (Sf): {sf:.2f} g/L\n"
+                              f"Substrate Concentration in Reactor (S): {s:.2f} g/L\n"
+                              f"Time (t): {t:.2f} h\n\n"
+                              f"Substrate Feeding Rate (Fs): {feeding_rate:.4f} g/L·h")
+        except ValueError:
+            self.append_results("Error: Please enter valid numbers in all fields.")
         except Exception as e:
-            self.results_text.setPlainText(f"Error: {str(e)}")
+            self.append_results(f"Error: {str(e)}")
 
     @pyqtSlot()
     def calculate_biomass_concentration(self):
@@ -176,9 +229,15 @@ class FedBatchBioreactorCalculator(QWidget):
             t = float(self.xt_time_input.text())
 
             biomass_concentration = x0 + (mu * x0 * t)
-            self.results_text.setPlainText(f"Biomass Concentration (Xt): {biomass_concentration:.4f}")
+            self.append_results(f"Biomass Concentration Results:\n\n"
+                              f"Initial Biomass Concentration (X0): {x0:.2f} g/L\n"
+                              f"Specific Growth Rate (μ): {mu:.4f} h⁻¹\n"
+                              f"Time (t): {t:.2f} h\n\n"
+                              f"Biomass Concentration (Xt): {biomass_concentration:.4f} g/L")
+        except ValueError:
+            self.append_results("Error: Please enter valid numbers in all fields.")
         except Exception as e:
-            self.results_text.setPlainText(f"Error: {str(e)}")
+            self.append_results(f"Error: {str(e)}")
 
     @pyqtSlot()
     def calculate_product_formation_rate(self):
@@ -187,13 +246,18 @@ class FedBatchBioreactorCalculator(QWidget):
             dt = float(self.dt_input.text())
 
             if dt <= 0:
-                self.results_text.setPlainText("Error: Change in time (dt) must be greater than zero.")
+                self.append_results("Error: Change in time (dt) must be greater than zero.")
                 return
 
             product_rate = dp / dt
-            self.results_text.setPlainText(f"Product Formation Rate (rp): {product_rate:.4f}")
+            self.append_results(f"Product Formation Rate Results:\n\n"
+                              f"Change in Product Concentration (dP): {dp:.2f} g/L\n"
+                              f"Change in Time (dt): {dt:.2f} h\n\n"
+                              f"Product Formation Rate (rp): {product_rate:.4f} g/L·h")
+        except ValueError:
+            self.append_results("Error: Please enter valid numbers in all fields.")
         except Exception as e:
-            self.results_text.setPlainText(f"Error: {str(e)}")
+            self.append_results(f"Error: {str(e)}")
 
     @pyqtSlot()
     def calculate_yield_coefficient(self):
@@ -202,10 +266,35 @@ class FedBatchBioreactorCalculator(QWidget):
             delta_s = float(self.delta_s_input.text())
 
             if delta_s == 0:
-                self.results_text.setPlainText("Error: Change in substrate concentration (ΔS) must not be zero.")
+                self.append_results("Error: Change in substrate concentration (ΔS) must not be zero.")
                 return
 
             yield_coefficient = delta_x / delta_s
-            self.results_text.setPlainText(f"Yield Coefficient (YX/S): {yield_coefficient:.4f}")
+            self.append_results(f"Yield Coefficient Results:\n\n"
+                              f"Change in Biomass Concentration (ΔX): {delta_x:.2f} g/L\n"
+                              f"Change in Substrate Concentration (ΔS): {delta_s:.2f} g/L\n\n"
+                              f"Yield Coefficient (YX/S): {yield_coefficient:.4f} g/g")
+        except ValueError:
+            self.append_results("Error: Please enter valid numbers in all fields.")
         except Exception as e:
-            self.results_text.setPlainText(f"Error: {str(e)}")
+            self.append_results(f"Error: {str(e)}")
+            
+    @pyqtSlot()
+    def clear_all(self):
+        """Clear all input fields and results"""
+        self.sf_input.clear()
+        self.s_input.clear()
+        self.time_input.clear()
+        self.x0_input.clear()
+        self.mu_input.clear()
+        self.xt_time_input.clear()
+        self.dp_input.clear()
+        self.dt_input.clear()
+        self.delta_x_input.clear()
+        self.delta_s_input.clear()
+        self.results_text.clear()
+        
+    @pyqtSlot()
+    def clear_results(self):
+        """Clear only the results text area"""
+        self.results_text.clear()
